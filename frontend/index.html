@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #222;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #00a8e8;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .welcome-section {
+            margin-bottom: 50px;
+        }
+        .welcome-section h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #00a8e8;
+        }
+        .welcome-section p {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        .access-channels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        .channel-card {
+            background-color: #222;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .channel-card:hover {
+            transform: translateY(-5px);
+            border-color: #00a8e8;
+            box-shadow: 0 10px 30px rgba(0, 168, 232, 0.3);
+        }
+        .channel-card.user {
+            border-left: 4px solid #00a8e8;
+        }
+        .channel-card.merchant {
+            border-left: 4px solid #28a745;
+        }
+        .channel-card.admin {
+            border-left: 4px solid #dc3545;
+        }
+        .channel-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .channel-card.user .channel-icon {
+            color: #00a8e8;
+        }
+        .channel-card.merchant .channel-icon {
+            color: #28a745;
+        }
+        .channel-card.admin .channel-icon {
+            color: #dc3545;
+        }
+        .channel-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #f0f0f0;
+        }
+        .channel-card p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .channel-button {
+            background: linear-gradient(135deg, #00a8e8, #007bb5);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .channel-card.merchant .channel-button {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+        .channel-card.admin .channel-button {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        .channel-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .feature-card {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        .feature-card h3 {
+            color: #00a8e8;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="nav-links">
+            <a href="user/index.html">用户首页</a>
+            <a href="user/hot_playmates.html">热门陪玩</a>
+            <a href="user/hot_games.html">热门游戏</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1>欢迎来到游戏陪玩服务平台</h1>
+            <p>专业的游戏陪玩服务，让您的游戏体验更加精彩</p>
+        </div>
+
+        <div class="access-channels">
+            <div class="channel-card user" onclick="location.href='user/login.html'">
+                <div class="channel-icon">👤</div>
+                <h3>用户通道</h3>
+                <p>寻找专业游戏陪玩，享受优质游戏体验。注册成为用户，快速找到心仪的陪玩服务。</p>
+                <a href="user/login.html" class="channel-button">进入用户通道</a>
+            </div>
+            
+            <div class="channel-card merchant" onclick="location.href='merchant/merchant_login.html'">
+                <div class="channel-icon">🏪</div>
+                <h3>商家通道</h3>
+                <p>游戏陪玩商家入驻平台。管理您的陪玩团队，接单服务，提升业务效率。</p>
+                <a href="merchant/merchant_login.html" class="channel-button">进入商家通道</a>
+            </div>
+            
+            <div class="channel-card admin" onclick="location.href='manage/admin_login.html'">
+                <div class="channel-icon">⚙️</div>
+                <h3>管理员通道</h3>
+                <p>平台管理后台。监控系统运行，管理用户商家，维护平台秩序。</p>
+                <a href="manage/admin_login.html" class="channel-button">进入管理员通道</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>专业陪玩</h3>
+                <p>海量专业游戏陪玩，覆盖各类热门游戏</p>
+            </div>
+            <div class="feature-card">
+                <h3>安全保障</h3>
+                <p>实名认证体系，确保交易安全可靠</p>
+            </div>
+            <div class="feature-card">
+                <h3>优质服务</h3>
+                <p>7x24小时客服支持，随时解决您的问题</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>俱乐部端登录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f6f7f9; margin:0; }
+    .wrap { max-width: 420px; margin: 40px auto; background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); overflow:hidden; }
+    .header { padding:20px 24px; border-bottom:1px solid #eee; }
+    .header h1 { font-size:18px; margin:0; }
+    .content { padding:20px 24px; }
+    .tabs { display:flex; border:1px solid #eee; border-radius:8px; overflow:hidden; margin-bottom:16px; }
+    .tab { flex:1; text-align:center; padding:10px; cursor:pointer; background:#fafafa; }
+    .tab.active { background:#fff; font-weight:bold; }
+    .field { margin-bottom:12px; }
+    .field label { display:block; margin-bottom:6px; color:#333; }
+    .field input { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box; }
+    .actions { margin-top:16px; }
+    button { width:100%; padding:12px; background:#4B7CFD; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:15px; }
+    button:disabled { opacity:0.6; cursor:not-allowed; }
+    .links { margin-top:14px; display:flex; justify-content:space-between; font-size:13px; }
+    .links a { color:#4B7CFD; text-decoration:none; }
+    .tip { font-size:12px; color:#666; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>俱乐部端登录</h1>
+      <div class="tip">登录方式：邮箱 + 密码 或 邮箱 + 验证码。注册需企业资质，审核通过后生效。</div>
+    </div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" id="tabPwd">邮箱+密码</div>
+        <div class="tab" id="tabCode">邮箱+验证码</div>
+      </div>
+
+      <form id="formPwd">
+        <div class="field">
+          <label for="emailPwd">邮箱</label>
+          <input id="emailPwd" type="email" placeholder="请输入邮箱" required />
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input id="password" type="password" placeholder="请输入密码" required />
+        </div>
+        <div class="actions">
+          <button id="btnLoginPwd" type="submit">登录</button>
+        </div>
+      </form>
+
+      <form id="formCode" style="display:none;">
+        <div class="field">
+          <label for="emailCode">邮箱</label>
+          <input id="emailCode" type="email" placeholder="请输入邮箱" required />
+        </div>
+        <div class="field" style="display:flex; gap:8px;">
+          <div style="flex:1;">
+            <label for="code">验证码</label>
+            <input id="code" type="text" placeholder="请输入邮箱验证码" required />
+          </div>
+          <div style="width:150px;">
+            <label>&nbsp;</label>
+            <button id="btnSendCode" type="button">发送验证码</button>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="btnLoginCode" type="submit">登录</button>
+        </div>
+      </form>
+
+      <div class="links">
+        <a href="club_onboarding.html">俱乐部入驻</a>
+        <a href="../user/login.html">返回用户入口</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import ClubAuthService from '../src/services/club-auth-service.js'
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('俱乐部登录页面加载完成，初始化认证功能')
+      initializeAuthHandlers()
+    })
+
+    // 选项卡切换
+    const tabPwd = document.getElementById('tabPwd');
+    const tabCode = document.getElementById('tabCode');
+    const formPwd = document.getElementById('formPwd');
+    const formCode = document.getElementById('formCode');
+
+    tabPwd.addEventListener('click', () => {
+      tabPwd.classList.add('active'); tabCode.classList.remove('active');
+      formPwd.style.display = ''; formCode.style.display = 'none';
+    });
+    tabCode.addEventListener('click', () => {
+      tabCode.classList.add('active'); tabPwd.classList.remove('active');
+      formCode.style.display = ''; formPwd.style.display = 'none';
+    });
+
+    function initializeAuthHandlers() {
+      // 邮箱密码登录
+      formPwd.addEventListener('submit', handleEmailPasswordLogin)
+
+      // 邮箱验证码登录
+      formCode.addEventListener('submit', handleVerificationCodeLogin)
+
+      // 发送验证码
+      document.getElementById('btnSendCode').addEventListener('click', handleSendVerificationCode)
+    }
+
+    async function handleEmailPasswordLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailPwd').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('请填写邮箱和密码');
+        return;
+      }
+
+      const loginButton = document.getElementById('btnLoginPwd');
+      loginButton.disabled = true;
+      loginButton.textContent = '登录中...';
+
+      try {
+        const result = await ClubAuthService.loginWithEmail(email, password);
+        alert('登录成功！');
+        console.log('俱乐部登录成功:', result);
+        
+        // 存储俱乐部信息
+        localStorage.setItem('role', 'merchant');
+        localStorage.setItem('club_id', result.club.id);
+        localStorage.setItem('club_name', result.club.club_name);
+        localStorage.setItem('merchant_email', email);
+
+        // 跳转到俱乐部管理页面
+        location.href = './club_dashboard.html';
+      } catch (error) {
+        console.error('俱乐部登录失败:', error);
+        alert('登录失败: ' + error.message);
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = '登录';
+      }
+    }
+
+    async function handleVerificationCodeLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailCode').value.trim();
+      const code = document.getElementById('code').value.trim();
+
+      if (!email || !code) {
+        alert('请填写邮箱和验证码');
+        return;
+      }
+
+      const loginButton = document.getElementById('btnLoginCode');
+      loginButton.disabled = true;
+      loginButton.textContent = '登录中...';
+
+      try {
+        const result = await ClubAuthService.loginWithVerificationCode(email, code);
+        alert('登录成功！');
+        console.log('验证码登录成功:', result);
+        
+        // 存储俱乐部信息
+        localStorage.setItem('role', 'merchant');
+        localStorage.setItem('club_id', result.club.id);
+        localStorage.setItem('club_name', result.club.club_name);
+        localStorage.setItem('merchant_email', email);
+
+        // 跳转到俱乐部管理页面
+        location.href = './club_dashboard.html';
+      } catch (error) {
+        console.error('验证码登录失败:', error);
+        alert('登录失败: ' + error.message);
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = '登录';
+      }
+    }
+
+    async function handleSendVerificationCode() {
+      const email = document.getElementById('emailCode').value.trim();
+      if (!email) {
+        alert('请先填写邮箱');
+        return;
+      }
+
+      const sendButton = document.getElementById('btnSendCode');
+      sendButton.disabled = true;
+      sendButton.textContent = '发送中...';
+
+      try {
+        const result = await ClubAuthService.sendVerificationCode(email);
+        alert(result.message);
+      } catch (error) {
+        console.error('发送验证码失败:', error);
+        alert('发送失败: ' + error.message);
+      } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = '发送验证码';
+      }
+    }
+  </script>
+</body>
+</html>

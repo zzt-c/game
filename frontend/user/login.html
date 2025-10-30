@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录/注册 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background-color: #222; /* Darker background for container */
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-container h2 {
+            color: #00a8e8; /* Tencent-like blue */
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #aaa;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="password"],
+        .input-group input[type="email"] {
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            padding: 12px 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #333;
+            color: #f0f0f0;
+        }
+        .input-group input[type="text"]:focus,
+        .input-group input[type="password"]:focus,
+        .input-group input[type="email"]:focus {
+            border-color: #00a8e8;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 232, 0.5);
+        }
+        .button-group {
+            margin-top: 30px;
+        }
+        .button-group button {
+            width: 100%;
+            padding: 15px;
+            background-color: #00a8e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button-group button:hover {
+            background-color: #007bb5;
+        }
+        .switch-form {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .switch-form a {
+            color: #00a8e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+        .social-login {
+            margin-top: 30px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+        .social-login p {
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        .social-buttons button {
+            background-color: #333;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 0 10px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+        .social-buttons button:hover {
+            background-color: #444;
+        }
+        .social-buttons .wechat {
+            color: #07c160;
+        }
+        .social-buttons .qq {
+            color: #12b7f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header" style="background-color: #222; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); position: absolute; top: 0; width: 100%;">
+        <div class="logo" style="font-size: 24px; font-weight: bold; color: #00a8e8;">游戏陪玩</div>
+        <div class="user-nav">
+            <a href="index.html" style="color: #f0f0f0; text-decoration: none; margin-left: 25px; font-size: 15px; transition: color 0.3s ease;">首页</a>
+        </div>
+    </div>
+    <div class="login-container">
+        <h2>登录/注册</h2>
+
+        <div id="login-form">
+            <div class="input-group">
+                <label for="email-login">邮箱</label>
+                <input type="email" id="email-login" placeholder="请输入邮箱地址">
+            </div>
+            <div class="input-group">
+                <label for="password-login">密码</label>
+                <input type="password" id="password-login" placeholder="请输入密码">
+            </div>
+            <div class="button-group">
+                <button>登录</button>
+            </div>
+            <div class="switch-form">
+                <a href="#" onclick="showResetPasswordForm()">忘记密码？</a> | <a href="#" onclick="showRegisterForm()">立即注册</a>
+            </div>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <div class="input-group">
+                <label for="email-register">邮箱</label>
+                <input type="email" id="email-register" placeholder="请输入邮箱地址">
+            </div>
+            <div class="input-group">
+                <label for="username-register">用户名</label>
+                <input type="text" id="username-register" placeholder="请输入用户名">
+            </div>
+            <div class="input-group">
+                <label for="password-register">设置密码</label>
+                <input type="password" id="password-register" placeholder="请设置登录密码（至少6位）">
+            </div>
+
+            <div class="button-group">
+                <button>注册</button>
+            </div>
+            <div class="switch-form">
+                已有账号？<a href="#" onclick="showLoginForm()">立即登录</a>
+            </div>
+        </div>
+
+        <div id="reset-password-form" style="display: none;">
+            <div class="input-group">
+                <label for="email-reset">邮箱</label>
+                <input type="email" id="email-reset" placeholder="请输入注册邮箱">
+            </div>
+            <div class="button-group">
+                <button>发送重置邮件</button>
+            </div>
+            <div class="switch-form">
+                <a href="#" onclick="showLoginForm()">返回登录</a>
+            </div>
+        </div>
+
+        <div class="social-login">
+            <p>或使用第三方账号登录</p>
+            <div class="social-buttons">
+                <button class="wechat">微信登录</button>
+                <button class="qq">QQ登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Supabase和API -->
+    <script type="module">
+        import { supabase } from '../src/supabase-config.js'
+        import AuthService from '../src/services/auth-service.js'
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('登录页面加载完成，初始化认证功能')
+            initializeAuthHandlers()
+        })
+
+        function initializeAuthHandlers() {
+            // 登录按钮事件
+            const loginButton = document.querySelector('#login-form button')
+            loginButton.addEventListener('click', handleLogin)
+
+            // 注册按钮事件
+            const registerButton = document.querySelector('#register-form button')
+            registerButton.addEventListener('click', handleRegister)
+
+            // 重置密码按钮事件
+            const resetPasswordButton = document.querySelector('#reset-password-form button')
+            resetPasswordButton.addEventListener('click', handleResetPassword)
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('email-login').value
+            const password = document.getElementById('password-login').value
+
+            if (!email || !password) {
+                alert('请输入邮箱和密码')
+                return
+            }
+
+            try {
+                const result = await AuthService.login(email, password)
+                alert('登录成功！')
+                console.log('登录成功:', result)
+                
+                // 跳转到首页
+                window.location.href = 'index.html'
+            } catch (error) {
+                console.error('登录失败:', error)
+                alert('登录失败: ' + error.message)
+            }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('email-register').value
+            const username = document.getElementById('username-register').value
+            const password = document.getElementById('password-register').value
+
+            if (!email || !username || !password) {
+                alert('请填写邮箱、用户名和密码')
+                return
+            }
+
+            if (password.length < 6) {
+                alert('密码长度至少6位')
+                return
+            }
+
+            try {
+                const result = await AuthService.register(email, password, username)
+                alert('注册成功！请检查邮箱确认邮件。')
+                console.log('注册成功:', result)
+                
+                // 注册成功后跳转到登录页
+                showLoginForm()
+            } catch (error) {
+                console.error('注册失败:', error)
+                alert('注册失败: ' + error.message)
+            }
+        }
+
+        async function handleResetPassword() {
+            const email = document.getElementById('email-reset').value
+
+            if (!email) {
+                alert('请输入邮箱地址')
+                return
+            }
+
+            try {
+                await AuthService.resetPassword(email)
+                alert('重置密码邮件已发送，请检查您的邮箱。')
+                showLoginForm()
+            } catch (error) {
+                console.error('重置密码失败:', error)
+                
+                // 处理特定的错误类型
+                if (error.message.includes('email rate limit exceeded')) {
+                    alert('邮件发送频率过高，请等待1小时后再试。')
+                } else if (error.message.includes('user not found')) {
+                    alert('该邮箱地址未注册，请检查邮箱是否正确。')
+                } else {
+                    alert('重置密码失败: ' + error.message)
+                }
+            }
+        }
+
+        // 表单切换函数 - 导出到全局作用域
+        window.showRegisterForm = function() {
+            console.log('切换到注册表单')
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('reset-password-form').style.display = 'none';
+        }
+
+        window.showLoginForm = function() {
+            console.log('切换到登录表单')
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('reset-password-form').style.display = 'none';
+        }
+
+        window.showResetPasswordForm = function() {
+            console.log('切换到重置密码表单')
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('reset-password-form').style.display = 'block';
+        }
+
+        // 第三方登录（示例）
+        document.querySelector('.wechat').addEventListener('click', () => {
+            alert('微信登录功能待开发')
+        })
+
+        document.querySelector('.qq').addEventListener('click', () => {
+            alert('QQ登录功能待开发')
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text color */
+        }
+        .header {
+            background-color: #222;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8; /* Tencent-like blue */
+            margin-right: 30px;
+        }
+        .header .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 5px 15px;
+            max-width: 400px;
+        }
+        .header .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #f0f0f0;
+            padding: 5px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .header .search-bar button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .header .user-nav {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        .header .user-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .header .user-nav a:hover {
+            color: #00a8e8;
+        }
+        .header .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #222; /* Darker background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar {
+            width: 200px;
+            margin-right: 20px;
+            padding-right: 20px;
+            border-right: 1px solid #333;
+        }
+        .sidebar h3 {
+            color: #00a8e8;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #aaa;
+            display: block;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            color: #00a8e8;
+            font-weight: bold;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding-left: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #333; /* Darker background for sections */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .section h2 {
+            color: #00a8e8;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            border: 3px solid #00a8e8;
+        }
+        .profile-info h3 {
+            margin: 0;
+            color: #f0f0f0;
+            font-size: 24px;
+        }
+        .profile-info p {
+            color: #aaa;
+            margin: 5px 0 0;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-item span:first-child {
+            font-weight: bold;
+            color: #aaa;
+        }
+        .info-item span:last-child {
+            color: #f0f0f0;
+        }
+        .action-list a {
+            display: block;
+            padding: 12px 15px;
+            background-color: #444;
+            border: 1px solid #555;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #f0f0f0;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .action-list a:hover {
+            background-color: #00a8e8;
+            transform: translateX(5px);
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="module">
+        import { supabase } from '../src/supabase-config.js'
+        import { UserService } from '../src/services/user-service.js'
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 清除可能的缓存
+            if (window.location.search.includes('refresh')) {
+                // 强制重新加载用户数据
+                await loadUserProfile(true)
+            } else {
+                await loadUserProfile()
+            }
+        })
+
+        // 加载用户资料
+        async function loadUserProfile(forceRefresh = false) {
+            try {
+                // 获取当前会话
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+                
+                if (sessionError) {
+                    console.error('获取会话失败:', sessionError)
+                    redirectToLogin()
+                    return
+                }
+
+                if (!session) {
+                    redirectToLogin()
+                    return
+                }
+
+                const userId = session.user.id
+                
+                // 获取用户信息，强制刷新时清除缓存
+                const userProfile = await UserService.getUserProfile(userId)
+                console.log('用户数据加载成功:', userProfile)
+                
+                // 更新页面显示
+                updateProfileDisplay(userProfile)
+                
+            } catch (error) {
+                console.error('加载用户资料失败:', error)
+                showError('加载用户资料失败，请刷新页面重试')
+            }
+        }
+
+        // 更新页面显示
+        function updateProfileDisplay(userProfile) {
+            try {
+                // 更新头像
+                const avatarImg = document.querySelector('.profile-header img')
+                if (avatarImg && userProfile.avatar_url) {
+                    avatarImg.src = userProfile.avatar_url
+                }
+
+                // 更新用户信息
+                const profileInfo = document.querySelector('.profile-info')
+                if (profileInfo) {
+                    const nameElement = profileInfo.querySelector('h3')
+                    if (nameElement) {
+                        nameElement.textContent = userProfile.username || '用户昵称'
+                    }
+                    
+                    const idElement = profileInfo.querySelector('p:nth-child(2)')
+                    if (idElement) {
+                        idElement.textContent = `ID: ${userProfile.id}`
+                    }
+                    
+                    // 删除绑定手机显示
+                    const phoneElement = profileInfo.querySelector('p:nth-child(3)')
+                    if (phoneElement) {
+                        phoneElement.remove()
+                    }
+                }
+
+                // 更新基本信息 - 使用更精确的选择器
+                const infoSection = document.querySelector('.section:nth-child(2)')
+                if (infoSection) {
+                    console.log('找到基本信息区域:', infoSection)
+                    
+                    // 真实姓名 - 使用更精确的选择器
+                    const nameSpan = infoSection.querySelector('.info-item:nth-of-type(1) span:last-child')
+                    if (nameSpan) {
+                        console.log('设置真实姓名:', userProfile.real_name)
+                        nameSpan.textContent = userProfile.real_name || '未设置'
+                    } else {
+                        console.log('未找到真实姓名元素')
+                    }
+                    
+                    // 性别 - 使用更精确的选择器
+                    const genderSpan = infoSection.querySelector('.info-item:nth-of-type(2) span:last-child')
+                    if (genderSpan) {
+                        console.log('设置性别:', userProfile.gender)
+                        genderSpan.textContent = userProfile.gender === 'male' ? '男' : userProfile.gender === 'female' ? '女' : '未设置'
+                    } else {
+                        console.log('未找到性别元素')
+                    }
+                    
+                    // 年龄 - 使用更精确的选择器
+                    const ageSpan = infoSection.querySelector('.info-item:nth-of-type(3) span:last-child')
+                    if (ageSpan) {
+                        console.log('设置年龄:', userProfile.age)
+                        ageSpan.textContent = userProfile.age ? `${userProfile.age}岁` : '未设置'
+                    } else {
+                        console.log('未找到年龄元素')
+                    }
+                    
+                    // 更新实名认证状态
+                    const authLink = infoSection.querySelector('.info-item:nth-of-type(4) a')
+                    if (authLink) {
+                        console.log('设置实名认证状态:', userProfile.is_verified)
+                        if (userProfile.is_verified) {
+                            authLink.textContent = '已认证'
+                            authLink.style.color = '#00a8e8'
+                        } else {
+                            authLink.textContent = '未认证'
+                            authLink.style.color = '#ff6b6b'
+                        }
+                    } else {
+                        console.log('未找到实名认证元素')
+                    }
+                } else {
+                    console.log('未找到基本信息区域')
+                }
+
+                // 更新余额
+                const balanceLink = document.querySelector('.action-list a:first-child')
+                if (balanceLink) {
+                    const balance = userProfile.balance || 0
+                    balanceLink.textContent = `账户余额: ¥ ${balance.toFixed(2)}`
+                }
+
+                // 更新导航栏头像
+                const navAvatar = document.querySelector('.header .avatar')
+                if (navAvatar && userProfile.username) {
+                    navAvatar.textContent = userProfile.username.substring(0, 1)
+                }
+            } catch (error) {
+                console.error('更新页面显示失败:', error)
+                // 不显示错误提示，避免干扰用户体验
+            }
+        }
+
+        // 重定向到登录页
+        function redirectToLogin() {
+            alert('请先登录')
+            window.location.href = 'login.html'
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const errorDiv = document.createElement('div')
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff6b6b;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            `
+            errorDiv.textContent = message
+            document.body.appendChild(errorDiv)
+            
+            setTimeout(() => {
+                errorDiv.remove()
+            }, 5000)
+        }
+
+        // 退出登录
+        document.addEventListener('click', async function(e) {
+            if (e.target.closest('a[href="login.html"]') && e.target.closest('.sidebar')) {
+                e.preventDefault()
+                await supabase.auth.signOut()
+                window.location.href = 'login.html'
+            }
+        })
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索陪玩、俱乐部、游戏...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-nav">
+            <a href="index.html">首页</a>
+            <a href="order.html">我的订单</a>
+            <a href="profile.html">个人中心</a>
+            <a href="login.html">登录/注册</a>
+            <div class="avatar">我</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3>个人中心</h3>
+            <ul>
+                <li><a href="profile.html" class="active">个人资料</a></li>
+                <li><a href="edit_profile.html">修改资料</a></li>
+                <li><a href="profile.html">钱包管理</a></li>
+                <li><a href="chat.html">客服消息</a></li>
+                <li><a href="login.html">退出登录</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/100?text=用户头像" alt="用户头像">
+                <div class="profile-info">
+                    <h3>用户昵称</h3>
+                    <p>ID: 123456789</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>基本信息</h2>
+                <div class="info-item">
+                    <span>真实姓名</span>
+                    <span>张三</span>
+                </div>
+                <div class="info-item">
+                    <span>性别</span>
+                    <span>男</span>
+                </div>
+                <div class="info-item">
+                    <span>年龄</span>
+                    <span>25</span>
+                </div>
+                <div class="info-item">
+                    <span>实名认证</span>
+                    <a href="real_name_auth.html" style="color: #00a8e8; text-decoration: none;">已认证</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>我的资产</h2>
+                <div class="action-list">
+                    <a href="#">账户余额: ¥ 150.00</a>
+                    <a href="#">充值</a>
+                    <a href="#">提现</a>
+                    <a href="#">优惠券 (3张可用)</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>常用功能</h2>
+                <div class="action-list">
+                    <a href="#">修改密码</a>
+                    <a href="#">地址管理</a>
+                    <a href="#">消息通知</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

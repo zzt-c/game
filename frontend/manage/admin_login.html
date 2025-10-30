@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>平台管理端登录</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#0f172a; margin:0; color:#e5e7eb; }
+    .wrap { max-width: 420px; margin: 60px auto; background:#111827; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,0.4); overflow:hidden; }
+    .header { padding:22px 24px; border-bottom:1px solid #1f2937; }
+    .header h1 { font-size:18px; margin:0; color:#fff; }
+    .content { padding:20px 24px; }
+    .field { margin-bottom:12px; }
+    .field label { display:block; margin-bottom:6px; color:#9ca3af; }
+    .field input { width:100%; padding:10px; border:1px solid #374151; border-radius:8px; box-sizing:border-box; background:#0b1220; color:#e5e7eb; }
+    .actions { margin-top:16px; }
+    button { width:100%; padding:12px; background:#2563eb; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:15px; }
+    .tip { font-size:12px; color:#9ca3af; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>平台管理端登录</h1>
+      <div class="tip">仅内部开通账号。登录方式：工号/用户名 + 密码 + 二次验证（TOTP）。</div>
+    </div>
+    <div class="content">
+      <form id="formAdmin">
+        <div class="field">
+          <label for="empId">工号/用户名</label>
+          <input id="empId" type="text" placeholder="请输入工号或用户名" required />
+        </div>
+        <div class="field">
+          <label for="adminPwd">密码</label>
+          <input id="adminPwd" type="password" placeholder="请输入密码" required />
+        </div>
+        <div class="field">
+          <label for="totp">二次验证码（TOTP）</label>
+          <input id="totp" type="text" placeholder="请输入 6 位动态码" required />
+        </div>
+        <div class="actions">
+          <button id="btnAdminLogin" type="submit">登录</button>
+        </div>
+      </form>
+
+      <div class="tip">无公开注册。仅由超级管理员在系统内部创建与分配账号。</div>
+      <div class="tip" style="margin-top:8px;"><a href="../login.html" style="color:#93c5fd; text-decoration:none;">返回用户入口</a></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('formAdmin').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const empId = document.getElementById('empId').value.trim();
+      const pwd = document.getElementById('adminPwd').value;
+      const totp = document.getElementById('totp').value.trim();
+
+      if (!empId || !pwd || !totp) { alert('请填写完整'); return; }
+      if (totp.length !== 6) { alert('动态码需为 6 位'); return; }
+
+      // 演示环境：不连后端，直接写入角色并跳转
+      localStorage.setItem('role', 'admin');
+      localStorage.setItem('token', 'mock-' + Date.now());
+      localStorage.setItem('admin_user', empId);
+
+      location.href = './admin_dashboard.html';
+    });
+  </script>
+</body>
+</html>

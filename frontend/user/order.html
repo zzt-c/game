@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的订单 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f0f0f0; /* Light text color */
+        }
+        .header {
+            background-color: #222;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8; /* Tencent-like blue */
+            margin-right: 30px;
+        }
+        .header .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 5px 15px;
+            max-width: 400px;
+        }
+        .header .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #f0f0f0;
+            padding: 5px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .header .search-bar button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .header .user-nav {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        .header .user-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .header .user-nav a:hover {
+            color: #00a8e8;
+        }
+        .header .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #222; /* Darker background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            color: #00a8e8;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .order-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .order-tabs button {
+            background-color: transparent;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #aaa;
+            transition: all 0.3s ease;
+        }
+        .order-tabs button.active {
+            color: #00a8e8;
+            border-bottom: 2px solid #00a8e8;
+            font-weight: bold;
+        }
+        .order-tabs button:hover:not(.active) {
+            color: #00a8e8;
+        }
+        .order-list .order-card {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .order-card .order-info {
+            flex-grow: 1;
+        }
+        .order-card .order-title {
+            font-weight: bold;
+            color: #00a8e8;
+            margin-bottom: 5px;
+        }
+        .order-card .order-meta {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        .order-card .order-status {
+            font-weight: bold;
+            color: #2ecc71; /* Green for completed */
+        }
+        .order-card .order-status.pending {
+            color: #f39c12; /* Orange for pending */
+        }
+        .order-card .order-status.cancelled {
+            color: #e74c3c; /* Red for cancelled */
+        }
+        .order-card .order-actions button {
+            background-color: #00a8e8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .order-card .order-actions button:hover {
+            background-color: #007bb5;
+        }
+        .order-card .order-actions button.cancel {
+            background-color: #e74c3c;
+        }
+        .order-card .order-actions button.cancel:hover {
+            background-color: #c0392b;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索陪玩、俱乐部、游戏...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-nav">
+            <a href="index.html">首页</a>
+            <a href="order.html">我的订单</a>
+            <a href="profile.html">个人中心</a>
+            <a href="login.html">登录/注册</a>
+            <div class="avatar">我</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>我的订单</h2>
+
+        <div class="order-tabs">
+            <button class="active">进行中</button>
+            <button>已完成</button>
+            <button>已取消</button>
+        </div>
+
+        <div class="order-list">
+            <!-- 进行中订单示例 -->
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-title">王者荣耀 - 小明 (高端上分)</div>
+                    <div class="order-meta">订单号: 20250820123456 | 下单时间: 2025-08-20 10:00</div>
+                    <div class="order-meta">金额: ¥ 100.00 | 陪玩者: 小明</div>
+                    <div class="order-status pending">进行中</div>
+                </div>
+                <div class="order-actions">
+                    <button>查看详情</button>
+                    <button class="cancel">申请退款</button>
+                </div>
+            </div>
+
+            <!-- 已完成订单示例 -->
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-title">英雄联盟 - 小红 (温柔辅助)</div>
+                    <div class="order-meta">订单号: 20250819987654 | 下单时间: 2025-08-19 14:30</div>
+                    <div class="order-meta">金额: ¥ 80.00 | 陪玩者: 小红</div>
+                    <div class="order-status">已完成</div>
+                </div>
+                <div class="order-actions">
+                    <button>查看详情</button>
+                    <button>评价</button>
+                </div>
+            </div>
+
+            <!-- 已取消订单示例 -->
+            <div class="order-card">
+                <div class="order-info">
+                    <div class="order-title">原神 - 老王 (资源全收集)</div>
+                    <div class="order-meta">订单号: 20250818112233 | 下单时间: 2025-08-18 18:00</div>
+                    <div class="order-meta">金额: ¥ 120.00 | 陪玩者: 老王</div>
+                    <div class="order-status cancelled">已取消</div>
+                </div>
+                <div class="order-actions">
+                    <button>查看详情</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
