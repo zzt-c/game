@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 俱乐部后台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background-color: #222;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00a8e8;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+        .sidebar ul li a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: block;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: #333;
+            color: #00a8e8;
+        }
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #1a1a1a;
+        }
+        .header {
+            background-color: #222;
+            padding: 20px 30px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #f0f0f0;
+            font-size: 28px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info span {
+            margin-right: 15px;
+            font-size: 16px;
+            color: #aaa;
+        }
+        .user-info a {
+            color: #00a8e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .settings-container {
+            display: flex;
+            gap: 30px;
+        }
+        .settings-sidebar {
+            width: 250px;
+            background-color: #222;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .settings-nav {
+            list-style: none;
+            padding: 0;
+        }
+        .settings-nav li {
+            margin-bottom: 10px;
+        }
+        .settings-nav a {
+            display: block;
+            padding: 12px 15px;
+            color: #f0f0f0;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        .settings-nav a:hover, .settings-nav a.active {
+            background-color: #333;
+            color: #00a8e8;
+        }
+
+        .settings-content {
+            flex: 1;
+            background-color: #222;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        .settings-section {
+            margin-bottom: 30px;
+        }
+        .settings-section h3 {
+            color: #00a8e8;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #f0f0f0;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: #00a8e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #0099d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #6c757d;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #00a8e8;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>俱乐部后台</h2>
+        <ul>
+            <li><a href="club_dashboard_demo.html"><i class="fas fa-chart-line"></i> 数据看板</a></li>
+            <li><a href="shop_management.html"><i class="fas fa-store"></i> 店铺管理</a></li>
+            <li><a href="game_order_management.html"><i class="fas fa-gamepad"></i> 陪玩单管理</a></li>
+            <li><a href="schedule_management.html"><i class="fas fa-calendar-alt"></i> 排班管理</a></li>
+            <li><a href="order_management.html"><i class="fas fa-receipt"></i> 订单管理</a></li>
+            <li><a href="customer_service.html"><i class="fas fa-headset"></i> 客服系统</a></li>
+            <li><a href="finance_statistics.html"><i class="fas fa-wallet"></i> 财务统计</a></li>
+            <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> 设置</a></li>
+        </ul>
+        <ul style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
+            <li><a href="../index.html"><i class="fas fa-arrow-left"></i> 返回用户端</a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>系统设置</h1>
+            <div class="user-info">
+                <span>欢迎，精英陪玩俱乐部A</span>
+                <a href="#">个人设置</a>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <div class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li><a href="#basic" class="active">基本设置</a></li>
+                    <li><a href="#security">安全设置</a></li>
+                    <li><a href="#notification">通知设置</a></li>
+                    <li><a href="#payment">支付设置</a></li>
+                    <li><a href="#integration">系统集成</a></li>
+                    <li><a href="#backup">数据备份</a></li>
+                    <li><a href="#about">关于系统</a></li>
+                </ul>
+            </div>
+
+            <div class="settings-content">
+                <div id="basic" class="settings-section">
+                    <h3>基本设置</h3>
+                    <div class="form-group">
+                        <label>俱乐部名称</label>
+                        <input type="text" value="精英陪玩俱乐部A">
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="tel" value="13800138000">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱地址</label>
+                        <input type="email" value="contact@elitegame.com">
+                    </div>
+                    <div class="form-group">
+                        <label>俱乐部介绍</label>
+                        <textarea>专业游戏陪玩服务平台，提供各类游戏高手陪玩服务，保证优质的游戏体验！</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>营业时间</label>
+                        <div class="form-row">
+                            <select>
+                                <option>09:00</option>
+                                <option selected>10:00</option>
+                                <option>11:00</option>
+                            </select>
+                            <select>
+                                <option>22:00</option>
+                                <option>23:00</option>
+                                <option selected>24:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn">保存设置</button>
+                </div>
+
+                <div id="security" class="settings-section">
+                    <h3>安全设置</h3>
+                    <div class="form-group">
+                        <label>登录密码</label>
+                        <input type="password" placeholder="输入新密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" placeholder="再次输入新密码">
+                    </div>
+                    <div class="form-group">
+                        <label>双重验证</label>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span style="margin-left: 10px; color: #aaa;">启用双重验证提升安全性</span>
+                    </div>
+                    <div class="form-group">
+                        <label>登录会话时长</label>
+                        <select>
+                            <option>1小时</option>
+                            <option selected>8小时</option>
+                            <option>24小时</option>
+                            <option>7天</option>
+                        </select>
+                    </div>
+                    <button class="btn">更新安全设置</button>
+                </div>
+
+                <div id="notification" class="settings-section">
+                    <h3>通知设置</h3>
+                    <div class="notification-item">
+                        <div>
+                            <strong>新订单通知</strong>
+                            <p>当有新订单时发送通知</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-item">
+                        <div>
+                            <strong>支付成功通知</strong>
+                            <p>客户支付成功后发送通知</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-item">
+                        <div>
+                            <strong>客服消息通知</strong>
+                            <p>收到客户咨询时发送通知</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-item">
+                        <div>
+                            <strong>系统维护通知</strong>
+                            <p>系统维护前发送通知</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn">保存通知设置</button>
+                </div>
+
+                <div id="payment" class="settings-section">
+                    <h3>支付设置</h3>
+                    <div class="form-group">
+                        <label>支付方式</label>
+                        <div>
+                            <label><input type="checkbox" checked> 微信支付</label>
+                            <label><input type="checkbox" checked> 支付宝</label>
+                            <label><input type="checkbox"> 银行卡支付</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>佣金比例</label>
+                        <input type="number" value="20" min="0" max="100" step="1"> %
+                    </div>
+                    <div class="form-group">
+                        <label>结算周期</label>
+                        <select>
+                            <option>每日结算</option>
+                            <option selected>每周结算</option>
+                            <option>每月结算</option>
+                        </select>
+                    </div>
+                    <button class="btn">更新支付设置</button>
+                </div>
+
+                <div id="about" class="settings-section">
+                    <h3>关于系统</h3>
+                    <div class="form-group">
+                        <label>系统版本</label>
+                        <input type="text" value="v2.1.0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>最后更新</label>
+                        <input type="text" value="2024-10-15" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>技术支持</label>
+                        <input type="text" value="tech@elitegame.com" readonly>
+                    </div>
+                    <button class="btn">检查更新</button>
+                    <button class="btn btn-secondary">系统诊断</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 简单的设置导航
+        document.querySelectorAll('.settings-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热门游戏 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background like Tencent Video */
+            color: #f0f0f0; /* Light text color */
+        }
+        .header {
+            background-color: #222;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8; /* Tencent-like blue */
+            margin-right: 30px;
+        }
+        .header .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 5px 15px;
+            max-width: 400px;
+        }
+        .header .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #f0f0f0;
+            padding: 5px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .header .search-bar button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .header .user-nav {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        .header .user-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .header .user-nav a:hover {
+            color: #00a8e8;
+        }
+        .header .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px); /* Adjust based on header height */
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #222;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+        .sidebar ul li a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: #333;
+            color: #00a8e8;
+        }
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+        .filter-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .filter-tabs button {
+            background: none;
+            border: none;
+            color: #aaa;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .filter-tabs button:hover, .filter-tabs button.active {
+            color: #00a8e8;
+            border-bottom: 2px solid #00a8e8;
+        }
+
+        .category-section {
+            display: none; /* Hidden by default */
+        }
+        .category-section.active {
+            display: block; /* Show active section */
+        }
+
+        .category-filters {
+            margin-bottom: 20px;
+        }
+        .category-filters .filter-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .category-filters .filter-row label {
+            color: #aaa;
+            margin-right: 15px;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+        .category-filters .filter-row .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .category-filters .filter-row .tags a {
+            color: #f0f0f0;
+            text-decoration: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            background-color: #333;
+            font-size: 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .category-filters .filter-row .tags a:hover, .category-filters .filter-row .tags a.active {
+            background-color: #00a8e8;
+            color: white;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .content-card {
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+        .content-card:hover {
+            transform: translateY(-5px);
+        }
+        .content-card img {
+            width: 100%;
+            height: 250px; /* Adjusted for poster-like aspect ratio */
+            object-fit: cover;
+            display: block;
+        }
+        .content-card .tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c; /* Red for "上新" */
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .content-card .vip-tag {
+            background-color: #f39c12; /* Orange for "VIP" */
+        }
+        .content-card .score {
+            position: absolute;
+            bottom: 60px; /* Above the text content */
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .content-card .info {
+            padding: 10px;
+            text-align: left;
+        }
+        .content-card .info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .content-card .info p {
+            margin: 0;
+            font-size: 13px;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+    <!-- FontAwesome for icons (optional, but good for visual) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索陪玩、俱乐部、游戏...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-nav">
+            <a href="index.html">首页</a>
+            <a href="order.html">我的订单</a>
+            <a href="profile.html">个人中心</a>
+            <a href="login.html">登录/注册</a>
+            <div class="avatar">我</div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> 首页</a></li>
+                <li><a href="hot_games.html" class="active"><i class="fas fa-gamepad"></i> 热门游戏</a></li>
+                <li><a href="index.html"><i class="fas fa-users"></i> 热门陪玩</a></li>
+                <li><a href="club.html"><i class="fas fa-store"></i> 俱乐部</a></li>
+                <li><a href="my_favorites.html"><i class="fas fa-heart"></i> 我的收藏</a></li>
+                <li><a href="chat.html"><i class="fas fa-comments"></i> 消息</a></li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <div class="filter-tabs">
+                <button class="tab-button active" data-category="fps">FPS</button>
+                <button class="tab-button" data-category="moba">MOBA</button>
+                <button class="tab-button" data-category="rpg">RPG</button>
+                <button class="tab-button" data-category="strategy">策略</button>
+                <button class="tab-button" data-category="casual">休闲</button>
+            </div>
+
+            <!-- FPS 游戏分类 -->
+            <div id="fps-section" class="category-section active">
+                <div class="category-filters">
+                    <div class="filter-row">
+                        <label>游戏:</label>
+                        <div class="tags">
+                            <a href="#" class="active">全部</a>
+                            <a href="#">CS2</a>
+                            <a href="#">绝地求生</a>
+                            <a href="#">APEX英雄</a>
+                            <a href="#">守望先锋</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=CS2" alt="CS2">
+                        <span class="tag">热门</span>
+                        <span class="score">9.8</span>
+                        <div class="info">
+                            <h4>CS2</h4>
+                            <p>经典FPS，战术竞技</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=绝地求生" alt="绝地求生">
+                        <span class="score">9.0</span>
+                        <div class="info">
+                            <h4>绝地求生</h4>
+                            <p>百人竞技，战术生存</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=APEX英雄" alt="APEX英雄">
+                        <span class="tag">新游</span>
+                        <span class="score">9.2</span>
+                        <div class="info">
+                            <h4>APEX英雄</h4>
+                            <p>团队战术，英雄技能</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=守望先锋" alt="守望先锋">
+                        <span class="score">8.5</span>
+                        <div class="info">
+                            <h4>守望先锋</h4>
+                            <p>团队射击，英雄对抗</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=Valorant" alt="Valorant">
+                        <span class="score">9.1</span>
+                        <div class="info">
+                            <h4>Valorant</h4>
+                            <p>战术射击，技能组合</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOBA 游戏分类 -->
+            <div id="moba-section" class="category-section">
+                <div class="category-filters">
+                    <div class="filter-row">
+                        <label>游戏:</label>
+                        <div class="tags">
+                            <a href="#" class="active">全部</a>
+                            <a href="#">英雄联盟</a>
+                            <a href="#">王者荣耀</a>
+                            <a href="#">DOTA2</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=英雄联盟" alt="英雄联盟">
+                        <span class="tag">热门</span>
+                        <span class="score">9.7</span>
+                        <div class="info">
+                            <h4>英雄联盟</h4>
+                            <p>经典MOBA，团队竞技</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=王者荣耀" alt="王者荣耀">
+                        <span class="score">9.5</span>
+                        <div class="info">
+                            <h4>王者荣耀</h4>
+                            <p>移动MOBA，随时开团</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=DOTA2" alt="DOTA2">
+                        <span class="score">8.9</span>
+                        <div class="info">
+                            <h4>DOTA2</h4>
+                            <p>硬核MOBA，策略至上</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RPG 游戏分类 -->
+            <div id="rpg-section" class="category-section">
+                <div class="category-filters">
+                    <div class="filter-row">
+                        <label>游戏:</label>
+                        <div class="tags">
+                            <a href="#" class="active">全部</a>
+                            <a href="#">原神</a>
+                            <a href="#">星穹铁道</a>
+                            <a href="#">魔兽世界</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=原神" alt="原神">
+                        <span class="tag">热门</span>
+                        <span class="score">9.6</span>
+                        <div class="info">
+                            <h4>原神</h4>
+                            <p>开放世界，元素战斗</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=星穹铁道" alt="星穹铁道">
+                        <span class="score">9.3</span>
+                        <div class="info">
+                            <h4>崩坏：星穹铁道</h4>
+                            <p>回合制RPG，宇宙冒险</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=魔兽世界" alt="魔兽世界">
+                        <span class="score">9.0</span>
+                        <div class="info">
+                            <h4>魔兽世界</h4>
+                            <p>经典MMORPG，史诗冒险</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 策略 游戏分类 -->
+            <div id="strategy-section" class="category-section">
+                <div class="category-filters">
+                    <div class="filter-row">
+                        <label>游戏:</label>
+                        <div class="tags">
+                            <a href="#" class="active">全部</a>
+                            <a href="#">星际争霸2</a>
+                            <a href="#">炉石传说</a>
+                            <a href="#">文明6</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=星际争霸2" alt="星际争霸2">
+                        <span class="score">9.4</span>
+                        <div class="info">
+                            <h4>星际争霸2</h4>
+                            <p>即时战略，电竞经典</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=炉石传说" alt="炉石传说">
+                        <span class="score">8.8</span>
+                        <div class="info">
+                            <h4>炉石传说</h4>
+                            <p>卡牌策略，轻松对战</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=文明6" alt="文明6">
+                        <span class="score">9.2</span>
+                        <div class="info">
+                            <h4>文明6</h4>
+                            <p>回合制策略，文明发展</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 休闲 游戏分类 -->
+            <div id="casual-section" class="category-section">
+                <div class="category-filters">
+                    <div class="filter-row">
+                        <label>游戏:</label>
+                        <div class="tags">
+                            <a href="#" class="active">全部</a>
+                            <a href="#">糖豆人</a>
+                            <a href="#">人类一败涂地</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=糖豆人" alt="糖豆人">
+                        <span class="score">8.7</span>
+                        <div class="info">
+                            <h4>糖豆人</h4>
+                            <p>多人闯关，欢乐竞技</p>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/180x250?text=人类一败涂地" alt="人类一败涂地">
+                        <span class="score">8.5</span>
+                        <div class="info">
+                            <h4>人类一败涂地</h4>
+                            <p>物理沙雕，解谜闯关</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const categorySections = document.querySelectorAll('.category-section');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and sections
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    categorySections.forEach(section => section.classList.remove('active'));
+
+                    // Add active class to the clicked button
+                    button.classList.add('active');
+
+                    // Show the corresponding category section
+                    const targetCategory = button.dataset.category;
+                    document.getElementById(targetCategory + '-section').classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

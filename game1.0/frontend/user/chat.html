@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background like Tencent Video */
+            color: #f0f0f0; /* Light text color */
+        }
+        .header {
+            background-color: #222;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8; /* Tencent-like blue */
+            margin-right: 30px;
+        }
+        .header .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 5px 15px;
+            max-width: 400px;
+        }
+        .header .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #f0f0f0;
+            padding: 5px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .header .search-bar button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .header .user-nav {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        .header .user-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .header .user-nav a:hover {
+            color: #00a8e8;
+        }
+        .header .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px); /* Adjust based on header height */
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #222;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+        .sidebar ul li a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: #333;
+            color: #00a8e8;
+        }
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1a1a1a;
+            display: flex; /* Added for chat layout */
+            flex-direction: column; /* Added for chat layout */
+        }
+
+        /* Chat Specific Styles */
+        .chat-container {
+            display: flex;
+            flex-grow: 1;
+            background-color: #222; /* Darker background for container */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            margin: 0; /* Remove margin as it's now in content-area */
+            max-width: none; /* Allow it to fill content-area */
+        }
+        .chat-sidebar {
+            width: 280px;
+            border-right: 1px solid #333;
+            background-color: #2c2c2c; /* Slightly lighter dark for sidebar */
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-sidebar h3 {
+            margin: 0;
+            padding: 15px;
+            background-color: #00a8e8;
+            color: white;
+            font-size: 18px;
+            border-top-left-radius: 8px;
+        }
+        .chat-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .chat-list li {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        .chat-list li:hover, .chat-list li.active {
+            background-color: #3a3a3a;
+        }
+        .chat-list li img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .chat-list li .chat-info {
+            flex-grow: 1;
+        }
+        .chat-list li .chat-info .name {
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+        .chat-list li .chat-info .last-msg {
+            font-size: 14px;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            background-color: #2c2c2c;
+            font-weight: bold;
+            color: #f0f0f0;
+            font-size: 18px;
+        }
+        .message-area {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #1a1a1a;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .message.self {
+            justify-content: flex-end;
+        }
+        .message.other .avatar {
+            margin-right: 10px;
+        }
+        .message.self .avatar {
+            margin-left: 10px;
+            order: 2;
+        }
+        .message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .message .bubble {
+            max-width: 60%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            position: relative;
+        }
+        .message.other .bubble {
+            background-color: #3a3a3a;
+            color: #f0f0f0;
+            border-bottom-left-radius: 0;
+        }
+        .message.self .bubble {
+            background-color: #00a8e8;
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+        .input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #333;
+            background-color: #2c2c2c;
+        }
+        .input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #444;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-right: 10px;
+            background-color: #333;
+            color: #f0f0f0;
+        }
+        .input-area button {
+            background-color: #00a8e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .input-area button:hover {
+            background-color: #007bb5;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索陪玩、俱乐部、游戏...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-nav">
+            <a href="order.html">我的订单</a>
+            <a href="profile.html">个人中心</a>
+            <a href="login.html">登录/注册</a>
+            <div class="avatar">我</div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> 首页</a></li>
+                <li><a href="hot_games.html"><i class="fas fa-gamepad"></i> 热门游戏</a></li>
+                <li><a href="hot_playmates.html"><i class="fas fa-users"></i> 热门陪玩</a></li>
+                <li><a href="club.html"><i class="fas fa-store"></i> 俱乐部</a></li>
+                <li><a href="my_favorites.html"><i class="fas fa-heart"></i> 我的收藏</a></li>
+                <li><a href="chat.html" class="active"><i class="fas fa-comments"></i> 消息</a></li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <div class="chat-container">
+                <div class="chat-sidebar">
+                    <h3>消息列表</h3>
+                    <ul class="chat-list">
+                        <li class="active">
+                            <img src="https://via.placeholder.com/50?text=客服" alt="客服头像">
+                            <div class="chat-info">
+                                <div class="name">平台客服</div>
+                                <div class="last-msg">您好，有什么可以帮助您的？</div>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="https://via.placeholder.com/50?text=小明" alt="小明头像">
+                            <div class="chat-info">
+                                <div class="name">陪玩者 小明</div>
+                                <div class="last-msg">好的，我已接单，稍后联系您。</div>
+                            </div>
+                        </li>
+                        <li>
+                            <img src="https://via.placeholder.com/50?text=俱乐部A" alt="俱乐部A头像">
+                            <div class="chat-info">
+                                <div class="name">精英陪玩俱乐部A</div>
+                                <div class="last-msg">欢迎咨询，我们有多种服务套餐。</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="chat-main">
+                    <div class="chat-header">平台客服</div>
+                    <div class="message-area">
+                        <!-- 聊天消息示例 -->
+                        <div class="message other">
+                            <img class="avatar" src="https://via.placeholder.com/40?text=客服" alt="客服头像">
+                            <div class="bubble">您好，有什么可以帮助您的？</div>
+                        </div>
+                        <div class="message self">
+                            <div class="bubble">我想咨询一下关于王者荣耀陪玩的服务。</div>
+                            <img class="avatar" src="https://via.placeholder.com/40?text=我" alt="我的头像">
+                        </div>
+                        <div class="message other">
+                            <img class="avatar" src="https://via.placeholder.com/40?text=客服" alt="客服头像">
+                            <div class="bubble">好的，请问您有什么具体需求呢？比如游戏段位、想玩的位置或者希望达到的目标？</div>
+                        </div>
+                        <div class="message self">
+                            <div class="bubble">我目前是星耀段位，想找个打野陪玩上王者。</div>
+                            <img class="avatar" src="https://via.placeholder.com/40?text=我" alt="我的头像">
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <input type="text" placeholder="输入消息...">
+                        <button>发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

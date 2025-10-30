@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热门陪玩 - 游戏陪玩服务平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Dark background like Tencent Video */
+            color: #f0f0f0; /* Light text color */
+        }
+        .header {
+            background-color: #222;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8e8; /* Tencent-like blue */
+            margin-right: 30px;
+        }
+        .header .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            border-radius: 20px;
+            padding: 5px 15px;
+            max-width: 400px;
+        }
+        .header .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #f0f0f0;
+            padding: 5px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .header .search-bar button {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .header .user-nav {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        .header .user-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .header .user-nav a:hover {
+            color: #00a8e8;
+        }
+        .header .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: white;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px); /* Adjust based on header height */
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #222;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+        .sidebar ul li a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: #333;
+            color: #00a8e8;
+        }
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1a1a1a;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00a8e8;
+            padding-bottom: 10px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .content-card {
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+        .content-card:hover {
+            transform: translateY(-5px);
+        }
+        .content-card img {
+            width: 100%;
+            height: 180px; /* Adjusted for playmate/club avatar */
+            object-fit: cover;
+            display: block;
+        }
+        .content-card .tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c; /* Red for "热门" */
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .content-card .vip-tag {
+            background-color: #f39c12; /* Orange for "VIP" */
+        }
+        .content-card .info {
+            padding: 10px;
+            text-align: left;
+        }
+        .content-card .info h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #00a8e8; /* Blue for names */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .content-card .info p {
+            margin: 0;
+            font-size: 14px;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .content-card .price {
+            font-size: 16px;
+            color: #27ae60; /* Green for price */
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .content-card .original-price {
+            text-decoration: line-through;
+            color: #777;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+    </style>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">游戏陪玩</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜索陪玩、俱乐部、游戏...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-nav">
+            <a href="index.html">首页</a>
+            <a href="order.html">我的订单</a>
+            <a href="profile.html">个人中心</a>
+            <a href="login.html">登录/注册</a>
+            <div class="avatar">我</div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> 首页</a></li>
+                <li><a href="hot_games.html"><i class="fas fa-gamepad"></i> 热门游戏</a></li>
+                <li><a href="hot_playmates.html" class="active"><i class="fas fa-users"></i> 热门陪玩</a></li>
+                <li><a href="club.html"><i class="fas fa-store"></i> 俱乐部</a></li>
+                <li><a href="my_favorites.html"><i class="fas fa-heart"></i> 我的收藏</a></li>
+                <li><a href="chat.html"><i class="fas fa-comments"></i> 消息</a></li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            <h2 class="section-title">热门俱乐部单子推荐</h2>
+            <div class="content-grid">
+                <!-- 俱乐部单子卡片示例 -->
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=俱乐部A" alt="俱乐部A">
+                    <span class="tag">热门</span>
+                    <div class="info">
+                        <h4>王者荣耀俱乐部</h4>
+                        <p>专业上分，包赢服务</p>
+                        <p class="price">¥ 80/小时</p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=俱乐部B" alt="俱乐部B">
+                    <div class="info">
+                        <h4>英雄联盟精英团</h4>
+                        <p>大神带飞，快速冲段</p>
+                        <p class="price">¥ 75/小时</p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=俱乐部C" alt="俱乐部C">
+                    <span class="tag vip-tag">VIP</span>
+                    <div class="info">
+                        <h4>绝地求生战队</h4>
+                        <p>吃鸡专家，战术指导</p>
+                        <p class="price">¥ 90/小时</p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=俱乐部D" alt="俱乐部D">
+                    <div class="info">
+                        <h4>原神探索队</h4>
+                        <p>全图鉴收集，资源代肝</p>
+                        <p class="price">¥ 60/小时</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">特价单推荐</h2>
+            <div class="content-grid">
+                <!-- 特价单陪玩卡片示例 -->
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=陪玩小明" alt="陪玩小明">
+                    <span class="tag">限时</span>
+                    <div class="info">
+                        <h4>陪玩小明 - 王者荣耀</h4>
+                        <p>国服打野，带你轻松上王者</p>
+                        <p class="price">¥ 30/小时 <span class="original-price">¥ 50</span></p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=陪玩小红" alt="陪玩小红">
+                    <div class="info">
+                        <h4>陪玩小红 - 英雄联盟</h4>
+                        <p>温柔辅助，峡谷不迷路</p>
+                        <p class="price">¥ 25/小时 <span class="original-price">¥ 40</span></p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=陪玩老王" alt="陪玩老王">
+                    <span class="tag">新客</span>
+                    <div class="info">
+                        <h4>陪玩老王 - 原神</h4>
+                        <p>带你探索提瓦特，资源全包</p>
+                        <p class="price">¥ 40/小时 <span class="original-price">¥ 60</span></p>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://via.placeholder.com/220x180?text=陪玩小李" alt="陪玩小李">
+                    <div class="info">
+                        <h4>陪玩小李 - 绝地求生</h4>
+                        <p>吃鸡高手，带你把把吃鸡</p>
+                        <p class="price">¥ 35/小时 <span class="original-price">¥ 55</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
