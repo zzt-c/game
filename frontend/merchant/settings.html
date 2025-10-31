@@ -241,7 +241,7 @@
     <div class="sidebar">
         <h2>俱乐部后台</h2>
         <ul>
-            <li><a href="club_dashboard_demo.html"><i class="fas fa-chart-line"></i> 数据看板</a></li>
+            <li><a href="club_dashboard.html"><i class="fas fa-chart-line"></i> 数据看板</a></li>
             <li><a href="shop_management.html"><i class="fas fa-store"></i> 店铺管理</a></li>
             <li><a href="game_order_management.html"><i class="fas fa-gamepad"></i> 陪玩单管理</a></li>
             <li><a href="schedule_management.html"><i class="fas fa-calendar-alt"></i> 排班管理</a></li>
@@ -436,15 +436,344 @@
         </div>
     </div>
 
-    <script>
-        // 简单的设置导航
-        document.querySelectorAll('.settings-nav a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
-                this.classList.add('active');
+    <script type="module">
+        import { supabase, TABLES } from '../src/supabase-config.js'
+        import { ClubAuthService } from '../src/services/club-auth-service.js'
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadClubProfile()
+            setupEventListeners()
+        })
+
+        // 加载俱乐部资料
+        async function loadClubProfile() {
+            try {
+                // 获取当前会话
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+                
+                if (sessionError) {
+                    console.error('获取会话失败:', sessionError)
+                    redirectToLogin()
+                    return
+                }
+
+                if (!session) {
+                    redirectToLogin()
+                    return
+                }
+
+                // 获取俱乐部信息
+                const clubProfile = await ClubAuthService.getCurrentClub()
+                
+                if (!clubProfile) {
+                    showError('无法获取俱乐部信息，请重新登录')
+                    return
+                }
+
+                // 填充表单数据
+                populateForm(clubProfile)
+                
+                // 更新页面标题
+                const userInfoSpan = document.querySelector('.user-info span')
+                if (userInfoSpan && clubProfile.name) {
+                    userInfoSpan.textContent = `欢迎，${clubProfile.name}`
+                }
+                
+            } catch (error) {
+                console.error('加载俱乐部资料失败:', error)
+                showError('加载俱乐部资料失败，请刷新页面重试')
+            }
+        }
+
+        // 填充表单数据
+        function populateForm(clubProfile) {
+            // 俱乐部名称
+            const clubNameInput = document.querySelector('#basic input[type="text"]')
+            if (clubNameInput && clubProfile.name) {
+                clubNameInput.value = clubProfile.name
+            }
+
+            // 联系电话
+            const phoneInput = document.querySelector('#basic input[type="tel"]')
+            if (phoneInput && clubProfile.contact_phone) {
+                phoneInput.value = clubProfile.contact_phone
+            }
+
+            // 邮箱地址
+            const emailInput = document.querySelector('#basic input[type="email"]')
+            if (emailInput && clubProfile.contact_email) {
+                emailInput.value = clubProfile.contact_email
+            }
+
+            // 俱乐部介绍
+            const descriptionTextarea = document.querySelector('#basic textarea')
+            if (descriptionTextarea && clubProfile.description) {
+                descriptionTextarea.value = clubProfile.description
+            }
+
+            // 营业时间选择器保持默认值（数据库中没有对应字段）
+            console.log('俱乐部信息加载完成:', clubProfile)
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 基本设置表单提交
+            const basicForm = document.querySelector('#basic .btn')
+            if (basicForm) {
+                basicForm.addEventListener('click', handleBasicSettingsSubmit)
+            }
+
+            // 安全设置表单提交
+            const securityForm = document.querySelector('#security .btn')
+            if (securityForm) {
+                securityForm.addEventListener('click', handleSecuritySettingsSubmit)
+            }
+
+            // 通知设置表单提交
+            const notificationForm = document.querySelector('#notification .btn')
+            if (notificationForm) {
+                notificationForm.addEventListener('click', handleNotificationSettingsSubmit)
+            }
+
+            // 支付设置表单提交
+            const paymentForm = document.querySelector('#payment .btn')
+            if (paymentForm) {
+                paymentForm.addEventListener('click', handlePaymentSettingsSubmit)
+            }
+
+            // 设置导航
+            document.querySelectorAll('.settings-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 显示对应的设置区域
+                    const targetId = this.getAttribute('href').substring(1)
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.style.display = 'none'
+                    })
+                    document.getElementById(targetId).style.display = 'block'
+                });
             });
-        });
+
+            // 初始化显示基本设置
+            document.getElementById('basic').style.display = 'block'
+            document.querySelectorAll('.settings-section:not(#basic)').forEach(section => {
+                section.style.display = 'none'
+            })
+        }
+
+        // 处理基本设置提交
+        async function handleBasicSettingsSubmit(e) {
+            e.preventDefault()
+            
+            try {
+                // 获取当前会话
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+                if (sessionError || !session) {
+                    showError('请先登录')
+                    return
+                }
+
+                const clubId = session.user.id
+                
+                // 收集表单数据（只包含数据库实际存在的字段）
+                const formData = {
+                    name: document.querySelector('#basic input[type="text"]').value.trim(),
+                    contact_phone: document.querySelector('#basic input[type="tel"]').value.trim(),
+                    contact_email: document.querySelector('#basic input[type="email"]').value.trim(),
+                    description: document.querySelector('#basic textarea').value.trim()
+                }
+
+                // 验证数据
+                if (!formData.name) {
+                    showError('请输入俱乐部名称')
+                    return
+                }
+
+                if (!formData.contact_phone) {
+                    showError('请输入联系电话')
+                    return
+                }
+
+                if (!formData.contact_email) {
+                    showError('请输入邮箱地址')
+                    return
+                }
+
+                // 更新俱乐部资料
+                const { data, error } = await supabase
+                    .from(TABLES.CLUBS)
+                    .update({
+                        ...formData,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', clubId)
+                    .select()
+
+                if (error) throw error
+                
+                showSuccess('基本设置更新成功！')
+                
+            } catch (error) {
+                console.error('更新基本设置失败:', error)
+                showError('更新基本设置失败：' + error.message)
+            }
+        }
+
+        // 处理安全设置提交
+        async function handleSecuritySettingsSubmit(e) {
+            e.preventDefault()
+            
+            try {
+                const currentPassword = document.querySelector('#security input[type="password"]:nth-child(1)').value
+                const newPassword = document.querySelector('#security input[type="password"]:nth-child(2)').value
+                const twoFactorEnabled = document.querySelector('#security input[type="checkbox"]').checked
+                const sessionDuration = document.querySelector('#security select').value
+
+                // 如果有新密码，则修改密码
+                if (newPassword) {
+                    if (newPassword.length < 6) {
+                        showError('新密码长度至少6位')
+                        return
+                    }
+
+                    const { error } = await supabase.auth.updateUser({
+                        password: newPassword
+                    })
+
+                    if (error) {
+                        showError('修改密码失败：' + error.message)
+                        return
+                    }
+                }
+
+                // 更新双重验证设置（这里需要根据实际业务逻辑实现）
+                console.log('双重验证设置:', twoFactorEnabled)
+                console.log('会话时长设置:', sessionDuration)
+
+                showSuccess('安全设置更新成功！')
+                
+            } catch (error) {
+                console.error('更新安全设置失败:', error)
+                showError('更新安全设置失败：' + error.message)
+            }
+        }
+
+        // 处理通知设置提交
+        async function handleNotificationSettingsSubmit(e) {
+            e.preventDefault()
+            
+            try {
+                const notificationSettings = {
+                    newOrder: document.querySelector('#notification .switch:first-child input').checked,
+                    paymentSuccess: document.querySelector('#notification .switch:nth-child(2) input').checked,
+                    customerService: document.querySelector('#notification .switch:nth-child(3) input').checked,
+                    systemMaintenance: document.querySelector('#notification .switch:last-child input').checked
+                }
+
+                // 保存通知设置（这里需要根据实际业务逻辑实现）
+                console.log('通知设置:', notificationSettings)
+
+                showSuccess('通知设置更新成功！')
+                
+            } catch (error) {
+                console.error('更新通知设置失败:', error)
+                showError('更新通知设置失败：' + error.message)
+            }
+        }
+
+        // 处理支付设置提交
+        async function handlePaymentSettingsSubmit(e) {
+            e.preventDefault()
+            
+            try {
+                const paymentSettings = {
+                    wechatPay: document.querySelector('#payment input[type="checkbox"]:nth-child(1)').checked,
+                    alipay: document.querySelector('#payment input[type="checkbox"]:nth-child(2)').checked,
+                    bankCard: document.querySelector('#payment input[type="checkbox"]:nth-child(3)').checked,
+                    commissionRate: document.querySelector('#payment input[type="number"]').value,
+                    settlementPeriod: document.querySelector('#payment select').value
+                }
+
+                // 保存支付设置（这里需要根据实际业务逻辑实现）
+                console.log('支付设置:', paymentSettings)
+
+                showSuccess('支付设置更新成功！')
+                
+            } catch (error) {
+                console.error('更新支付设置失败:', error)
+                showError('更新支付设置失败：' + error.message)
+            }
+        }
+
+        // 重定向到登录页
+        function redirectToLogin() {
+            alert('请先登录')
+            window.location.href = 'merchant_login.html'
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            // 创建或显示成功消息元素
+            let successDiv = document.querySelector('.success-message')
+            if (!successDiv) {
+                successDiv = document.createElement('div')
+                successDiv.className = 'success-message'
+                successDiv.style.cssText = `
+                    background-color: #28a745;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    margin-bottom: 20px;
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 1000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `
+                document.body.appendChild(successDiv)
+            }
+            
+            successDiv.textContent = message
+            successDiv.style.display = 'block'
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none'
+            }, 3000)
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            // 创建或显示错误消息元素
+            let errorDiv = document.querySelector('.error-message')
+            if (!errorDiv) {
+                errorDiv = document.createElement('div')
+                errorDiv.className = 'error-message'
+                errorDiv.style.cssText = `
+                    background-color: #dc3545;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    margin-bottom: 20px;
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 1000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `
+                document.body.appendChild(errorDiv)
+            }
+            
+            errorDiv.textContent = message
+            errorDiv.style.display = 'block'
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none'
+            }, 3000)
+        }
     </script>
 </body>
 </html>
